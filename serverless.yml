@@ -39,7 +39,9 @@ provider:
   # These environment variables are made available to our functions
   # under process.env.
   environment:
-    tableName: ${self:custom.tableName}
+    tableName:
+      Ref: NotesTable
+    stripeSecretKey: ${self:custom.environment.stripeSecretKey}
 
   iamRoleStatements:
     - Effect: Allow
