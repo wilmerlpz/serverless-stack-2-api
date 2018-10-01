@@ -11,22 +11,24 @@ custom:
 
   # Our stage is based on what is passed in when running serverless
   # commands. Or fallsback to what we have set in the provider section.
-
   stage: ${opt:stage, self:provider.stage}
+  # Set the table name here so we can use it while testing locally
+  tableName: ${self:custom.stage}-notes
 
-   # Set our DynamoDB throughput for prod and all other non-prod stages.
-   tableThroughputs:
+  # Set our DynamoDB throughput for prod and all other non-prod stages.
+  tableThroughputs:
     prod: 5
     default: 1
-
   tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
-
-
 
   #Load the webpack config
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+
+    # Load our secret environment variables based on the current stage.
+  # Fallback to default if it is not in prod.
+  environment: ${file(env.yml):${self:custom.stage}, file(env.yml):default}
 
 provider:
   name: aws
@@ -37,8 +39,7 @@ provider:
   # These environment variables are made available to our functions
   # under process.env.
   environment:
-    tableName:
-      Ref: NotesTable
+    tableName: ${self:custom.tableName}
 
   iamRoleStatements:
     - Effect: Allow
@@ -122,12 +123,12 @@ functions:
           authorizer: aws_iam
 
 
-  # Create our resources with separate CloudFormation templates
-    resources:
-      # DynamoDB
-      - ${file(resources/dynamodb-table.yml)}
-      # S3
-      - ${file(resources/s3-bucket.yml)}
-      # Cognito
-      - ${file(resources/cognito-user-pool.yml)}
-      - ${file(resources/cognito-identity-pool.yml)}
+# Create our resources with separate CloudFormation templates
+resources:
+  # DynamoDB
+  - ${file(resources/dynamodb-table.yml)}
+  # S3
+  - ${file(resources/s3-bucket.yml)}
+  # Cognito
+  - ${file(resources/cognito-user-pool.yml)}
+  - ${file(resources/cognito-identity-pool.yml)}
