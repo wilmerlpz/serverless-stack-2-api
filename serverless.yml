@@ -58,7 +58,6 @@ provider:
         - "Fn::GetAtt": [ NotesTable, Arn ]
 
 
-
 functions:
   # Defines an HTTP API endpoint that calls the main function in create.js
   # - path: url path is /notes
