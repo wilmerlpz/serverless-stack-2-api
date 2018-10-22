@@ -24,6 +24,6 @@ export async function main(event, context, callback) {
     callback(null, success(params.Item));
   } catch (e) {
     console.log(e);
-    callback(null, failure({ status: false }));
+    callback(null, failure({ status: false,  TableName: process.env.TableName, errormsg: e }));
   }
 }
